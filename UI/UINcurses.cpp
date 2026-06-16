@@ -2,7 +2,9 @@
 
 UINcurses::UINcurses() {
     initscr();
+    cbreak();             // Captura teclas inmediatamente sin esperar Enter
     noecho();
+    keypad(stdscr, TRUE); // Habilita el uso de las flechas del teclado
     curs_set(0);
 
     clear(); // Borra la pantalla anterior
@@ -17,8 +19,13 @@ void UINcurses::dibujarPared(int x, int y) {
     refresh();
 
 }
-void UINcurses::borrarPared(int x, int y) {
+void UINcurses::borrarCelda(int x, int y) {
     mvaddch(x, y, ' ');
     refresh();
 
+}
+
+void UINcurses::dibujarPersonaje(int x, int y) {
+    mvaddch(x, y, 'X');
+    refresh();
 }

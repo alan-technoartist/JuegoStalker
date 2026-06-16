@@ -7,5 +7,6 @@ public:
     ~UINcurses();
 
     void dibujarPared(int x, int y) override;
-    void borrarPared(int x, int y) override;
+    void borrarCelda(int x, int y) override;
+    void dibujarPersonaje(int x, int y) override;
 };

@@ -16,7 +16,7 @@ Laberinto::Laberinto(std::shared_ptr<UI> ui) {
 void Laberinto::dibujarCaminos(int x, int y) {
     // Marcar celda como visitada (camino libre)
     laberinto[x][y] = 0;
-    ui->borrarPared(x, y);
+    ui->borrarCelda(x, y);
 
     std::array < int, 4 > movimientosX = { -2, 2, 0, 0 };
     std::array < int, 4 > movimientosY = { 0, 0, -2, 2 };
@@ -48,7 +48,7 @@ void Laberinto::dibujarCaminos(int x, int y) {
 
             // "Derribar" pared intermedia
             laberinto[xMedio][yMedio] = 0;
-            ui->borrarPared(xMedio, yMedio);
+            ui->borrarCelda(xMedio, yMedio);
 
             // Avanzar a la siguiente celda
             dibujarCaminos(nuevoX, nuevoY);
@@ -81,7 +81,7 @@ void Laberinto::crearCiclos(float porcentaje) {
 
                 // "Derribar" pared
                 laberinto[x][y] = 0;
-                ui->borrarPared(x, y);
+                ui->borrarCelda(x, y);
 
             }
         }
@@ -91,4 +91,10 @@ void Laberinto::crearCiclos(float porcentaje) {
 void Laberinto::dibujarLaberinto() {
     dibujarCaminos(1, 1);
     crearCiclos(0.1f);
+}
+
+bool Laberinto::esPared(int x, int y) {
+    if (laberinto[x][y] == 1)
+        return true;
+    return false;
 }

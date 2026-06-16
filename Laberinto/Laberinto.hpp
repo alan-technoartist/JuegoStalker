@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include <random>
 
@@ -21,5 +23,5 @@ public:
     Laberinto(std::shared_ptr<UI> ui);
 
     void dibujarLaberinto();
-    //bool esPared(int x, int y);
+    bool esPared(int x, int y);
 };
