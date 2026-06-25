@@ -1,32 +1,42 @@
 #include "ClienteRed.hpp"
 #include <iostream>
 
+#include <boost/asio/write.hpp>
+
 using namespace boost::asio;
 
-awaitable<void> ClienteRed::comunicarCliente(io_context& io_ctx) {
-    // Socket TCP
-    ip::tcp::socket socket(io_ctx);
-
-    // "Resolutor" traduce a direcciones IP + puerto
-    ip::tcp::resolver resolutor(io_ctx);
-
-    auto endpoints = co_await resolutor.async_resolve("localhost", "5000");
-
-    co_await async_connect(socket, endpoints);
-
-    char buffer[128];
-
-    co_await socket.async_read_some(boost::asio::buffer(buffer));
-
-    std::cout << "El servidor dice: " << buffer << std::endl;
+void ClienteRed::enviarDatos(void* data) {
+    // Asignar buffer
+    // TODO: verificar posibles condiciones de carrera
 
 }
 
-void ClienteRed::inicializar(io_context& io_ctx) {
-    co_spawn(io_ctx, comunicarCliente(io_ctx), detached);
+void ClienteRed::leerDatos(void* buf) {
+    // Copiar datos del buffer 
+    // TODO: verificar posibles condiciones de carrera
+}
 
-    hiloRed_ = std::thread([&io_ctx]() {
-        // Encender motor de eventos asíncronos
+void ClienteRed::inicializar() {
+
+    ip::tcp::resolver resolver(io_ctx);
+    auto socket = std::make_shared<ip::tcp::socket>(io_ctx);
+
+    // Conectar y recibir handshake inicial de forma síncrona
+    boost::asio::connect(*socket, resolver.resolve("localhost", "5000"));
+    //boost::asio::read(*socket, boost::asio::buffer(&init, sizeof(init)));
+
+    // Lanzar bucle asíncrono
+    co_spawn(io_ctx, loop(socket), detached);
+
+    // Lanzar motor de asio en hilo separado
+    io_thread = std::thread([&] {
         io_ctx.run();
-        });
+    });
+}
+
+awaitable<void> ClienteRed::loop(std::shared_ptr<ip::tcp::socket> socket) {
+    //while (true) 
+    //  async_read
+    //  async_write
+
 }

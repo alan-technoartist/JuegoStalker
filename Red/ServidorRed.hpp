@@ -4,12 +4,18 @@ using namespace boost::asio;
 
 class ServidorRed {
 private:
-	std::unique_ptr<boost::asio::ip::tcp::acceptor> aceptador_;
-	std::thread hiloRed_;
+	io_context     io_ctx;
+	std::thread          io_thread_;
+	std::vector<uint8_t> send_buf_;
+	std::vector<uint8_t> recv_buf_;
 
-	awaitable<void> escribirDatos(std::shared_ptr<ip::tcp::socket> socket);
-	awaitable<void> aceptarConexion(io_context& io_context);
+	awaitable<void> loop(std::shared_ptr<ip::tcp::socket> socket);
 
 public:
-	void inicializar(io_context& io_ctx);
+	// Interfaces para el personaje
+	void enviarDatos(void* data);
+	void leerDatos(void* buf);
+
+	// Interfaz para main
+	void inicializar();
 };

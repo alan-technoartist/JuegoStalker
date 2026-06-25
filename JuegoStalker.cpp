@@ -23,8 +23,6 @@ int main(int argc, char* argv[])
     std::shared_ptr<Personaje> personaje;
     //std::shared_ptr<Perseguidor> perseguidor;
 
-    // Objeto para despacho de eventos asíncronos (boost)
-    io_context io_context;
 
 #ifdef CURSES
     //ui = std::make_shared<UINcurses>();
@@ -61,16 +59,14 @@ int main(int argc, char* argv[])
     }
     else if (opcion == 2) {
         // Multijugador (heroe)
-        ServidorRed* servidor = new ServidorRed;
-        servidor->inicializar(io_context);
+
 
 
     }
     else if (opcion == 3) {
         // Multijugador (perseguidor)
 
-        ClienteRed* cliente = new ClienteRed;
-        cliente->inicializar(io_context);
+
 
     }
 
