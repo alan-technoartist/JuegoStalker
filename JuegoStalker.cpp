@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
         // Perseguidor humano remoto
         perseguidor = std::make_shared<PerseguidorHumanoRemoto>();
 
-
     }
     else if (opcion == 3) {
         // Multijugador (perseguidor)

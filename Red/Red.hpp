@@ -1,3 +1,4 @@
+#pragma once
 
 class Red {
 	// TODO: Implementar funciones base y quitarlas de las clases hijas

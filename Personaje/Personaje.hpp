@@ -1,6 +1,8 @@
+#pragma once
+
 #include <memory>
 #include "../Laberinto/Laberinto.hpp"
-#include "../UI/UI.hpp"
+//#include "../UI/UI.hpp"
 
 enum class Direccion {
 	ARRIBA = 0,
@@ -16,7 +18,7 @@ struct Posicion {
 
 class Personaje {
 protected:
-	std::shared_ptr<UI> ui;
+	//std::shared_ptr<UI> ui;
 	std::shared_ptr<Laberinto> laberinto;
 public:
 
