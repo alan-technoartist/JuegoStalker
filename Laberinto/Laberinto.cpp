@@ -5,7 +5,7 @@ Laberinto::Laberinto(std::shared_ptr<UI> ui) {
 
     for (int x = 0; x < LAB_HEIGHT; x++) {
         for (int y = 0; y < LAB_WIDTH; y++) {
-            ui->dibujarPared(x, y);
+            //ui->dibujarPared(x, y);
 
             // Inincializar matriz de laberinto
             laberinto[x][y] = 1;
@@ -13,20 +13,23 @@ Laberinto::Laberinto(std::shared_ptr<UI> ui) {
     }
 }
 
+void Laberinto::iniciarMotor(uint32_t semillaInicial) {
+    this->semillaInicial = semillaInicial;
+    generador.seed(semillaInicial);
+}
+
+
 void Laberinto::dibujarCaminos(int x, int y) {
     // Marcar celda como visitada (camino libre)
     laberinto[x][y] = 0;
-    ui->borrarCelda(x, y);
+    //ui->borrarCelda(x, y);
 
     std::array < int, 4 > movimientosX = { -2, 2, 0, 0 };
     std::array < int, 4 > movimientosY = { 0, 0, -2, 2 };
     std::array < int, 4 > direcciones = { 0, 1, 2, 3 };
 
-    // Fuente de entropía
-    std::random_device semilla;
-
     // Motor de generación (Mersenne Twister)
-    std::mt19937 generador(semilla());
+    //std::mt19937 generador(semillaInicial);
 
     std::shuffle(direcciones.begin(), direcciones.end(), generador);
 
@@ -48,7 +51,7 @@ void Laberinto::dibujarCaminos(int x, int y) {
 
             // "Derribar" pared intermedia
             laberinto[xMedio][yMedio] = 0;
-            ui->borrarCelda(xMedio, yMedio);
+            //ui->borrarCelda(xMedio, yMedio);
 
             // Avanzar a la siguiente celda
             dibujarCaminos(nuevoX, nuevoY);
@@ -58,11 +61,9 @@ void Laberinto::dibujarCaminos(int x, int y) {
 }
 
 void Laberinto::crearCiclos(float porcentaje) {
-    // Fuente de entropía
-    std::random_device semilla;
 
     // Motor de generación (Mersenne Twister)
-    std::mt19937 generador(semilla());
+    //std::mt19937 generador(semillaInicial);
 
     // Distribución uniforme (rango: porcentaje)
     std::uniform_real_distribution distribucion(0.0, 1.0);
@@ -81,14 +82,14 @@ void Laberinto::crearCiclos(float porcentaje) {
 
                 // "Derribar" pared
                 laberinto[x][y] = 0;
-                ui->borrarCelda(x, y);
+                //ui->borrarCelda(x, y);
 
             }
         }
     }
 }
 
-void Laberinto::dibujarLaberinto() {
+void Laberinto::generar() {
     dibujarCaminos(1, 1);
     crearCiclos(0.1f);
 }
@@ -97,4 +98,21 @@ bool Laberinto::esPared(int x, int y) {
     if (laberinto[x][y] == 1)
         return true;
     return false;
+}
+
+Posicion Laberinto::obtenerCasillaLibre() {
+
+    // Distribución uniforme (rango: porcentaje)
+    std::uniform_int_distribution distribucionX(1, LAB_WIDTH - 1);
+    std::uniform_int_distribution distribucionY(1, LAB_HEIGHT - 1);
+
+    Posicion casillaLibre;
+
+    do {
+        casillaLibre.posicionX = distribucionX(generador);
+        casillaLibre.posicionY = distribucionY(generador);
+
+    } while (esPared(casillaLibre.posicionX, casillaLibre.posicionY));
+
+    return casillaLibre;
 }

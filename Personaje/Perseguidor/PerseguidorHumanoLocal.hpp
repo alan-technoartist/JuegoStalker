@@ -2,15 +2,16 @@
 #include "../../UI/UINcurses.hpp"
 #include "../../Red/ClienteRed.hpp"
 
-
 class PerseguidorHumanoLocal : public Personaje {
 private:
-	void moverLocal(Direccion direccion);
-	ClienteRed red;
-public:
+	std::shared_ptr<ClienteRed> red;
 
-	PerseguidorHumanoLocal(Posicion posicionInicial);
-	~PerseguidorHumanoLocal();
+	void moverLocal(Direccion direccion);
+
+public:
+	std::random_device semillaInicial;
+
+	PerseguidorHumanoLocal(Posicion posicionInicial, std::shared_ptr<ClienteRed> red);
 
 	void mover() override;
 

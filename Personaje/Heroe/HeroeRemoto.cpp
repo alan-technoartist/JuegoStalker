@@ -3,10 +3,6 @@
 
 HeroeRemoto::HeroeRemoto(Posicion posicionInicial) {
     posicion = posicionInicial;
-    red.inicializar(sizeof(Posicion));
-}
-
-HeroeRemoto::~HeroeRemoto() {
 
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <memory>
 //#include "../Laberinto/Laberinto.hpp"
 #include "../Common/Common.hpp"
 //#include "../UI/UI.hpp"
@@ -15,5 +14,6 @@ public:
 
 	virtual ~Personaje() = default;
 
+	// Depende de cada rol (heroe/stalker|local/remoto)
 	virtual void mover() = 0;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <random>
 
 enum class Direccion {
 	ARRIBA = 0,
@@ -17,18 +18,17 @@ enum class Estado {
 struct Posicion {
 	uint8_t  posicionX;
 	uint8_t  posicionY;
+
+	bool operator==(Posicion& o) {
+		if ((o.posicionX == this->posicionX) &&
+			(o.posicionY == this->posicionY)) {
+			return true;
+		}
+		return false;
+	}
 };
 
 struct Llave {
-	uint8_t posicionX;
-	uint8_t posicionY;
-
+	Posicion posicion;
 	bool recolectada;
-};
-
-struct EstadoJuego {
-	Llave llaves[3];
-	Posicion salida;
-
-	Estado estado;
 };

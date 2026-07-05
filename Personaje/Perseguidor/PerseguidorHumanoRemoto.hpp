@@ -1,15 +1,12 @@
-#include <random>
-
 #include "../Personaje.hpp"
 #include "../../Red/ServidorRed.hpp"
 
 class PerseguidorHumanoRemoto : public Personaje {
 private:
-	ServidorRed red;
+	std::shared_ptr<ServidorRed> red;
 
 public:
-	PerseguidorHumanoRemoto(Posicion posicionInicial, std::random_device& semilla);
-	~PerseguidorHumanoRemoto();
+	PerseguidorHumanoRemoto(Posicion posicionInicial, std::shared_ptr<ServidorRed> red);
 
 	void mover() override;
 

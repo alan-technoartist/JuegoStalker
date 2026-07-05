@@ -5,10 +5,6 @@ HeroeLocal::HeroeLocal(Posicion posicionInicial) {
 	posicion = posicionInicial;
 }
 
-HeroeLocal::~HeroeLocal() {
-
-}
-
 void HeroeLocal::moverLocal(Direccion dir) {
 	/*switch (dir) {
 	case Direccion::IZQUIERDA:

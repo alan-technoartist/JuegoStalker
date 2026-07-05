@@ -8,7 +8,6 @@ private:
 public:
 
 	HeroeLocal(Posicion posicionInicial);
-	~HeroeLocal();
 
 	void mover() override;
 

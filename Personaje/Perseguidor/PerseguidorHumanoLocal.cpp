@@ -1,13 +1,9 @@
 
 #include "PerseguidorHumanoLocal.hpp"
 
-PerseguidorHumanoLocal::PerseguidorHumanoLocal(Posicion posicionInicial) {
-	posicion = posicionInicial;
-	red.inicializar(sizeof(Posicion));
-}
-
-PerseguidorHumanoLocal::~PerseguidorHumanoLocal() {
-
+PerseguidorHumanoLocal::PerseguidorHumanoLocal(Posicion posicionInicial, std::shared_ptr<ClienteRed> red) {
+	this->posicion = posicionInicial;
+	this->red = red;
 }
 
 void PerseguidorHumanoLocal::moverLocal(Direccion dir) {
@@ -63,7 +59,7 @@ void PerseguidorHumanoLocal::mover() {
 	}
 
 	// Mandar posición al héroe remoto
-	red.enviarDatos(&posicion, sizeof(posicion));
+	red->enviarDatos(&posicion, sizeof(posicion));
 }
 
 /*void HeroeLocal::inicializar() {

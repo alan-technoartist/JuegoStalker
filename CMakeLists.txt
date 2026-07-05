@@ -23,7 +23,7 @@ add_executable (JuegoStalker
 	"Personaje/Heroe/HeroeLocal.cpp"
 	"Red/ServidorRed.cpp"
 	"Red/ClienteRed.cpp"
- "Personaje/Heroe/HeroeRemoto.cpp" "Personaje/Perseguidor/PerseguidorHumanoLocal.cpp" "Personaje/Perseguidor/PerseguidorHumanoRemoto.cpp" "Personaje/Perseguidor/PerseguidorIA.cpp")
+ "Personaje/Heroe/HeroeRemoto.cpp" "Personaje/Perseguidor/PerseguidorHumanoLocal.cpp" "Personaje/Perseguidor/PerseguidorHumanoRemoto.cpp" "Personaje/Perseguidor/PerseguidorIA.cpp" "Red/RedBase.cpp")
 
 target_link_libraries(JuegoStalker PRIVATE unofficial::pdcurses::pdcurses)
 target_link_libraries(JuegoStalker PRIVATE Boost::headers)

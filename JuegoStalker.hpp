@@ -1,8 +1,7 @@
 ﻿#pragma once
 #define CURSES
 
-#include <iostream>
-#include <random>
+#include "Common/Common.hpp"
 
 #include "Laberinto/Laberinto.hpp"
 #include "Personaje/Heroe/HeroeLocal.hpp"
@@ -15,12 +14,8 @@
 #include "Red/ClienteRed.hpp"
 #include "UI/UI.hpp"
 
-#include <boost/asio.hpp>
-
 #ifdef CURSES
 #include "UI/UINcurses.hpp"
 #elif QT
 //#include "UI/UIQT.hpp"
 #endif
-
-using namespace boost::asio;
