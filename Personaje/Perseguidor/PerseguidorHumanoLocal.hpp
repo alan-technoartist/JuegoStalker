@@ -1,5 +1,4 @@
 #include "../Personaje.hpp"
-#include "../../UI/UINcurses.hpp"
 #include "../../Red/ClienteRed.hpp"
 
 class PerseguidorHumanoLocal : public Personaje {
@@ -9,9 +8,8 @@ private:
 	void moverLocal(Direccion direccion);
 
 public:
-	std::random_device semillaInicial;
 
-	PerseguidorHumanoLocal(Posicion posicionInicial, std::shared_ptr<ClienteRed> red);
+	PerseguidorHumanoLocal(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, std::shared_ptr<ClienteRed> red);
 
 	void mover() override;
 

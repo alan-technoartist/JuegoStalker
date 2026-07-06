@@ -1,38 +1,51 @@
 #include "ServidorRed.hpp"
 
-// TODO: usar clase UI
-#include <iostream>
+ServidorRed::ServidorRed(std::shared_ptr<UI> ui) :
+    RedBase(ui) {
+}
 
-void ServidorRed::inicializar() {
+void ServidorRed::inicializar(size_t tamanoMensaje) {
     // Crear acceptor
     ip::tcp::acceptor aceptador(io_ctx, ip::tcp::endpoint( ip::tcp::v4(), 6005 ));
 
     // Asignar el socket
     socket = std::make_shared<ip::tcp::socket>(io_ctx);
 
-    std::cout << "Esperando clientes..." << std::endl;
+    //ui->desplegarTexto("Esperando clientes...");
 
     // Escuchar y aceptar conexiones
     aceptador.accept(*socket);
 
-    std::cout << "Cliente conectado!" << std::endl;
+    //ui->desplegarTexto("Cliente conectado!");
+
+    tamanoMensaje = 2;
+    // Iniciar tamaño de los búferes
+    recv_buf.resize(tamanoMensaje);
+    send_buf.resize(tamanoMensaje);
+
+    // Registrar trabajo asíncrono
+    co_spawn(io_ctx, loop(socket), detached);
 
     // Lanzar motor de asio en un hilo separado
-    io_thread = std::thread([&] {
+    io_thread = std::thread([this] {
         io_ctx.run();
     });
 }
 
 awaitable<void> ServidorRed::loop(std::shared_ptr<ip::tcp::socket> socket) {
+    //ui->desplegarTexto("Iniciando loop de red...");
+
     try {
         while (true) {
-            co_await boost::asio::async_read(*socket, boost::asio::buffer(recv_buf));
-            std::cout << "Leido del cliente: " << recv_buf[0] << std::endl;
-            co_await boost::asio::async_write(*socket, boost::asio::buffer(send_buf));
-            std::cout << "Escrito al cliente: " << send_buf[0] << std::endl;
+            co_await boost::asio::async_read(*socket, boost::asio::buffer(recv_buf), use_awaitable);
+            //ui->desplegarTexto("Leido");
+
+            co_await boost::asio::async_write(*socket, boost::asio::buffer(send_buf), use_awaitable);
+            //ui->desplegarTexto("Escrito");
         }
     }
     catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        ui->desplegarTexto(e.what());
+
     }
 }

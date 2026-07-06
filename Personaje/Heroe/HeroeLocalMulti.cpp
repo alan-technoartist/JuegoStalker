@@ -1,44 +1,46 @@
-#include "PerseguidorHumanoLocal.hpp"
 
-PerseguidorHumanoLocal::PerseguidorHumanoLocal(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, std::shared_ptr<ClienteRed> red) :
+#include "HeroeLocalMulti.hpp"
+
+HeroeLocalMulti::HeroeLocalMulti(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, std::shared_ptr<ServidorRed> red) :
 	Personaje(posicionInicial, ui, laberinto) {
 	this->red = red;
+
 }
 
-void PerseguidorHumanoLocal::moverLocal(Direccion dir) {
+void HeroeLocalMulti::moverLocal(Direccion dir) {
 	switch (dir) {
 	case Direccion::IZQUIERDA:
 		if (!(laberinto.esPared(posicion.posicionX, posicion.posicionY - 1))) {
 			ui->borrarCelda(posicion.posicionX, posicion.posicionY);
 			posicion.posicionY -= 1;
-			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::PERSEGUIDOR);
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::HEROE);
 		}
 		break;
 	case Direccion::DERECHA:
 		if (!(laberinto.esPared(posicion.posicionX, posicion.posicionY + 1))) {
 			ui->borrarCelda(posicion.posicionX, posicion.posicionY);
 			posicion.posicionY += 1;
-			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::PERSEGUIDOR);
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::HEROE);
 		}
 		break;
 	case Direccion::ARRIBA:
 		if (!(laberinto.esPared(posicion.posicionX - 1, posicion.posicionY))) {
 			ui->borrarCelda(posicion.posicionX, posicion.posicionY);
 			posicion.posicionX -= 1;
-			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::PERSEGUIDOR);
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::HEROE);
 		}
 		break;
 	case Direccion::ABAJO:
 		if (!(laberinto.esPared(posicion.posicionX + 1, posicion.posicionY))) {
 			ui->borrarCelda(posicion.posicionX, posicion.posicionY);
 			posicion.posicionX += 1;
-			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::PERSEGUIDOR);
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::HEROE);
 		}
 		break;
 	}
 }
 
-void PerseguidorHumanoLocal::mover() {
+void HeroeLocalMulti::mover() {
 
 	Tecla tecla = ui->leerTeclado(); // Espera la entrada del usuario
 
@@ -57,6 +59,6 @@ void PerseguidorHumanoLocal::mover() {
 		break;
 	}
 
-	// Mandar posición al héroe remoto
+	// Mandar posición al perseguidor remoto
 	red->enviarDatos(&posicion, sizeof(posicion));
 }

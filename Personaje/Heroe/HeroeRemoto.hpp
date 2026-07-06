@@ -3,11 +3,11 @@
 
 class HeroeRemoto: public Personaje {
 private:
-	ClienteRed red;
+	std::shared_ptr<ClienteRed> red;
 
 public:
 
-	HeroeRemoto(Posicion posicionInicial);
+	HeroeRemoto(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, std::shared_ptr<ClienteRed> red);
 
 	void mover() override;
 

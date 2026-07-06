@@ -2,7 +2,8 @@
 
 class PerseguidorIA : public Personaje {
 public:
-	PerseguidorIA();
+
+	PerseguidorIA(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto);
 	~PerseguidorIA();
 
 	void mover() override;

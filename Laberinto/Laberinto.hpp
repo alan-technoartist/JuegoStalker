@@ -18,7 +18,7 @@ private:
     std::mt19937 generador;
     uint32_t semillaInicial;
 
-    void dibujarCaminos(int x, int y);
+    void crearCaminos(int x, int y);
     void crearCiclos(float porcentaje);
 
     std::shared_ptr<UI> ui;
@@ -29,6 +29,7 @@ public:
 
     void iniciarMotor(uint32_t semillaInicial);
     void generar();
+    void dibujar();
 
     // Regresa casilla sin pared (no garantiza libre de otros actores)
     Posicion obtenerCasillaLibre();

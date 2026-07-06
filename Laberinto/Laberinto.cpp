@@ -19,7 +19,7 @@ void Laberinto::iniciarMotor(uint32_t semillaInicial) {
 }
 
 
-void Laberinto::dibujarCaminos(int x, int y) {
+void Laberinto::crearCaminos(int x, int y) {
     // Marcar celda como visitada (camino libre)
     laberinto[x][y] = 0;
     //ui->borrarCelda(x, y);
@@ -27,9 +27,6 @@ void Laberinto::dibujarCaminos(int x, int y) {
     std::array < int, 4 > movimientosX = { -2, 2, 0, 0 };
     std::array < int, 4 > movimientosY = { 0, 0, -2, 2 };
     std::array < int, 4 > direcciones = { 0, 1, 2, 3 };
-
-    // Motor de generación (Mersenne Twister)
-    //std::mt19937 generador(semillaInicial);
 
     std::shuffle(direcciones.begin(), direcciones.end(), generador);
 
@@ -54,16 +51,13 @@ void Laberinto::dibujarCaminos(int x, int y) {
             //ui->borrarCelda(xMedio, yMedio);
 
             // Avanzar a la siguiente celda
-            dibujarCaminos(nuevoX, nuevoY);
+            crearCaminos(nuevoX, nuevoY);
         }
     }
 
 }
 
 void Laberinto::crearCiclos(float porcentaje) {
-
-    // Motor de generación (Mersenne Twister)
-    //std::mt19937 generador(semillaInicial);
 
     // Distribución uniforme (rango: porcentaje)
     std::uniform_real_distribution distribucion(0.0, 1.0);
@@ -90,11 +84,22 @@ void Laberinto::crearCiclos(float porcentaje) {
 }
 
 void Laberinto::generar() {
-    dibujarCaminos(1, 1);
+    crearCaminos(1, 1);
     crearCiclos(0.1f);
 }
 
-bool Laberinto::esPared(int x, int y) {
+void Laberinto::dibujar() {
+    for (int x = 0; x < LAB_HEIGHT; x++) {
+        for (int y = 0; y < LAB_WIDTH; y++) {
+            if (esPared(x, y) == true)
+                ui->dibujarPared(x, y);
+            else
+                ui->borrarCelda(x, y);
+        }
+    }
+}
+
+inline bool Laberinto::esPared(int x, int y) {
     if (laberinto[x][y] == 1)
         return true;
     return false;

@@ -6,7 +6,7 @@ private:
 	std::shared_ptr<ServidorRed> red;
 
 public:
-	PerseguidorHumanoRemoto(Posicion posicionInicial, std::shared_ptr<ServidorRed> red);
+	PerseguidorHumanoRemoto(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, std::shared_ptr<ServidorRed> red);
 
 	void mover() override;
 

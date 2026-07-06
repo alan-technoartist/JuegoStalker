@@ -4,10 +4,13 @@
 #include <memory>
 #include <thread>
 
+#include "../UI/UI.hpp"
+
 using namespace boost::asio;
 
 class RedBase {
 protected:
+	std::shared_ptr<UI> ui;
 	io_context io_ctx;
 	std::thread io_thread;
 	std::shared_ptr<ip::tcp::socket> socket;
@@ -18,20 +21,18 @@ protected:
 	virtual awaitable<void> loop(std::shared_ptr<ip::tcp::socket> socket) = 0;
 
 public:
+	RedBase(std::shared_ptr<UI> ui);
 	virtual ~RedBase();
 
 	// IO asíncrono
-	virtual void enviarDatos(void* datos, int tamano);
-	virtual void leerDatos(void* datos, int tamano);
+	void enviarDatos(void* datos, int tamano);
+	void leerDatos(void* datos, int tamano);
 
 	// IO síncrono
-	virtual void enviarDatos_sync(const void* datos, int tamano);
-	virtual void leerDatos_sync(void* datos, int tamano);
-
-	// Iniciar loop asíncrono
-	void iniciarIOAsincrono(int tamanoMensaje);
+	void enviarDatos_sync(const void* datos, int tamano);
+	void leerDatos_sync(void* datos, int tamano);
 
 	// Implementación depende del rol (cliente/servidor)
-	virtual void inicializar() = 0;
+	virtual void inicializar(size_t tamanoMensaje) = 0;
 
 };
