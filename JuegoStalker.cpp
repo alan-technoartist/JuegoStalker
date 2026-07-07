@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
     Posicion posicionInicialPerseguidor;
     Llave llaves[3];
     Posicion salida;
+    Estado estadoJuego = Estado::JUGANDO;
 
     //ui->desplegarTexto("1 - Jugador unico");
     //ui->desplegarTexto("2 - Multijugador (heroe)");
@@ -160,19 +161,53 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    bool gameRunning = true;
-
 	// Game loop
-	while(gameRunning) {
-
+	while(estadoJuego == Estado::JUGANDO) {
         heroe->mover();
         perseguidor->mover();
+
+        if (heroe->posicion == perseguidor->posicion) {
+            estadoJuego = Estado::PERDIDO;
+            break;
+        }
+
+        for (int i = 0; i < NUM_LLAVES; i++) {
+            if (heroe->posicion == llaves[i].posicion) {
+                llaves[i].recolectada = true;
+            }
+        }
+
+        bool todasLlaves = true;
+
+        for (int i = 0; i < NUM_LLAVES; i++) {
+            if (llaves[i].recolectada == false) {
+                todasLlaves = false;
+                break;
+            }
+        }
+
+        if (todasLlaves) {
+            if (heroe->posicion == salida) {
+                estadoJuego = Estado::GANADO;
+            }
+        }
 
         ui->render();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 	}
+    // Termina el juego
+
+    if (estadoJuego == Estado::PERDIDO) {
+        ui->desplegarTexto("========PERDISTE========");
+    }
+    else if (estadoJuego == Estado::GANADO) {
+        ui->desplegarTexto("========GANASTE========");
+
+    }
+
+    ui->leerTeclado();
 
 	return 0;
 }
