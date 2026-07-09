@@ -19,11 +19,11 @@ void ClienteRed::inicializar(size_t tamanoMensaje) {
     //ui->desplegarTexto("Conectado!");
 
     tamanoMensaje = 2;
-    // Iniciar tamaño de los búferes
+    // Iniciar tamaï¿½o de los bï¿½feres
     recv_buf.resize(tamanoMensaje);
     send_buf.resize(tamanoMensaje);
 
-    // Registrar trabajo asíncrono
+    // Registrar trabajo asï¿½ncrono
     co_spawn(io_ctx, loop(socket), detached);
 
     // Lanzar motor de asio en un hilo separado
@@ -37,11 +37,19 @@ awaitable<void> ClienteRed::loop(std::shared_ptr<ip::tcp::socket> socket) {
 
     try {
         while (true) {
-            co_await boost::asio::async_write(*socket, boost::asio::buffer(send_buf), use_awaitable);
-            //ui->desplegarTexto("Escrito");
+            {
+                std::lock_guard<std::mutex> guard(mutex_send_buf); // mutex.lock()
 
-            co_await boost::asio::async_read(*socket, boost::asio::buffer(recv_buf), use_awaitable);
-            //ui->desplegarTexto("Leido");
+                co_await boost::asio::async_write(*socket, boost::asio::buffer(send_buf), use_awaitable);
+                //ui->desplegarTexto("Escrito");
+            }
+
+            {
+                std::lock_guard<std::mutex> guard(mutex_recv_buf); // mutex.lock()
+
+                co_await boost::asio::async_read(*socket, boost::asio::buffer(recv_buf), use_awaitable);
+                //ui->desplegarTexto("Leido");
+            }
 
         }
     }
