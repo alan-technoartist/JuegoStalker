@@ -31,7 +31,6 @@ class UI {
 public:
     virtual Tecla leerTeclado() = 0;
 	virtual void desplegarTexto(std::string texto) = 0;
-
     virtual void dibujarPared(int x, int y) = 0;
     virtual void borrarCelda(int x, int y) = 0;
 	virtual void actualizarEntidad(int x, int y, TipoEntidad entidad) = 0;

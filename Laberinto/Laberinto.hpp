@@ -25,7 +25,8 @@ private:
 
 public:
     Laberinto(std::shared_ptr<UI> ui);
-
+    Posicion salida;
+    Posicion llaves[NUM_LLAVES];
 
     void iniciarMotor(uint32_t semillaInicial);
     void generar();
@@ -35,4 +36,6 @@ public:
     Posicion obtenerCasillaLibre();
 
     bool esPared(int x, int y);
+    bool esSalida(int x, int y);
+    bool hayLlave(int x, int y);
 };

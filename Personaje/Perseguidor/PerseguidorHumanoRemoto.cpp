@@ -11,10 +11,19 @@ void PerseguidorHumanoRemoto::mover() {
     // Recibir posición del perseguidor remoto
     red->leerDatos(&posicionPerseguidorRemoto, sizeof(posicionPerseguidorRemoto));
 
-    ui->borrarCelda(posicion.posicionX, posicion.posicionY);
+    // Perseguidor no debe borrar otras entidades
+	if (!laberinto.esSalida(posicion.posicionX, posicion.posicionY) &&
+		!laberinto.hayLlave(posicion.posicionX, posicion.posicionY))
+		ui->borrarCelda(posicion.posicionX, posicion.posicionY);
+	else {
+		if (laberinto.esSalida(posicion.posicionX, posicion.posicionY))
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::SALIDA);
+		else
+			ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::LLAVE);
+	}
 
+	// Actualizar posición
     posicion = posicionPerseguidorRemoto;
-
     ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::PERSEGUIDOR);
 
 }

@@ -11,10 +11,14 @@ void HeroeRemoto::mover() {
     // Recibir posición del heroe remoto
     red->leerDatos(&posicionHeroeRemoto, sizeof(posicionHeroeRemoto));
 
-    ui->borrarCelda(posicion.posicionX, posicion.posicionY);
+    // Héroe sólo debe borrar llaves, no salida
+    if (!laberinto.esSalida(posicion.posicionX, posicion.posicionY))
+        ui->borrarCelda(posicion.posicionX, posicion.posicionY);
+    else
+        ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::SALIDA);
 
+    // Actualizar posición
     posicion = posicionHeroeRemoto;
-
     ui->actualizarEntidad(posicion.posicionX, posicion.posicionY, TipoEntidad::HEROE);
 
 }

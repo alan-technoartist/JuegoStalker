@@ -121,3 +121,19 @@ Posicion Laberinto::obtenerCasillaLibre() {
 
     return casillaLibre;
 }
+
+bool Laberinto::esSalida(int x, int y) {
+    if (salida.posicionX == x && salida.posicionY == y) {
+        return true;
+    }
+    return false;
+}
+
+bool Laberinto::hayLlave(int x, int y) {
+    for (int i = 0; i < NUM_LLAVES; i++) {
+        if (llaves[i].posicionX == x && llaves[i].posicionY == y) {
+            return true;
+        }
+    }
+    return false;
+}

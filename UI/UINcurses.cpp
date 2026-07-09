@@ -7,6 +7,8 @@ UINcurses::UINcurses() {
     keypad(stdscr, TRUE); // Habilita el uso de las flechas del teclado
     curs_set(0);
 
+    nodelay(stdscr, TRUE); // Hace que getch() en stdscr no bloquee
+
     clear(); // Borra la pantalla anterior
 }
 UINcurses::~UINcurses() {
@@ -58,18 +60,18 @@ void UINcurses::desplegarTexto(std::string texto) {
 
 void UINcurses::dibujarPared(int x, int y) {
     mvaddch(x, y, ACS_BLOCK);
-   // refresh();
 
 }
 void UINcurses::borrarCelda(int x, int y) {
     mvaddch(x, y, ' ');
-    //refresh();
+
 }
 
 void UINcurses::actualizarEntidad(int x, int y, TipoEntidad entidad) {
 
     switch (entidad) {
     case TipoEntidad::HEROE:
+
         mvaddch(x, y, 'X');
         break;
     case TipoEntidad::PERSEGUIDOR:
@@ -83,7 +85,6 @@ void UINcurses::actualizarEntidad(int x, int y, TipoEntidad entidad) {
         break;
     }
 
-    //refresh();
 }
 
 void UINcurses::render() {

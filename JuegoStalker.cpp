@@ -29,15 +29,18 @@ void inicializarPosiciones(Laberinto& laberinto,
             llaves[i].recolectada = false;
         } while (llaves[i].posicion == posicionInicialPerseguidor);
     }
-    for (int i = 0; i < NUM_LLAVES; i++)
+    for (int i = 0; i < NUM_LLAVES; i++) {
         ui->actualizarEntidad(llaves[i].posicion.posicionX, llaves[i].posicion.posicionY, TipoEntidad::LLAVE);
-
+        laberinto.llaves[i].posicionX = llaves[i].posicion.posicionX;
+        laberinto.llaves[i].posicionY = llaves[i].posicion.posicionY;
+    }
 
     do {
         salida = laberinto.obtenerCasillaLibre();
     } while (salida == llaves[0].posicion ||
              salida == llaves[1].posicion ||
              salida == llaves[2].posicion);
+    laberinto.salida = salida;
     ui->actualizarEntidad(salida.posicionX, salida.posicionY, TipoEntidad::SALIDA);
 
 }
@@ -72,16 +75,25 @@ int main(int argc, char* argv[])
     Posicion posicionInicialHeroe;
     Posicion posicionInicialPerseguidor;
     Llave llaves[3];
+    int llavesRecolectadas = 0;
+
     Posicion salida;
     Estado estadoJuego = Estado::JUGANDO;
 
+
+    ui->desplegarTexto("Esperando entrada del usuario");
     //ui->desplegarTexto("1 - Jugador unico");
     //ui->desplegarTexto("2 - Multijugador (heroe)");
     //ui->desplegarTexto("3 - Multijugador (perseguidor)");
     //ui->desplegarTexto("4 - Salir");
 
-    Tecla opcion = ui->leerTeclado();
+    Tecla opcion;
+    do {
+         opcion = ui->leerTeclado();
+         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
+    } while (opcion == Tecla::NADA);
+    clear();
     if (opcion == Tecla::UNO) {
         // Un solo jugador
 
@@ -168,27 +180,31 @@ int main(int argc, char* argv[])
 
         if (heroe->posicion == perseguidor->posicion) {
             estadoJuego = Estado::PERDIDO;
-            break;
         }
 
-        for (int i = 0; i < NUM_LLAVES; i++) {
-            if (heroe->posicion == llaves[i].posicion) {
-                llaves[i].recolectada = true;
+        if (estadoJuego != Estado::PERDIDO) {
+            for (int i = 0; i < NUM_LLAVES; i++) {
+                if (heroe->posicion == llaves[i].posicion && llaves[i].recolectada != true) {
+                    llaves[i].recolectada = true;
+                    llavesRecolectadas++;
+                }
             }
-        }
 
-        bool todasLlaves = true;
-
-        for (int i = 0; i < NUM_LLAVES; i++) {
-            if (llaves[i].recolectada == false) {
-                todasLlaves = false;
-                break;
+            bool todasLlaves = true;
+            for (int i = 0; i < NUM_LLAVES; i++) {
+                if (llaves[i].recolectada == false) {
+                    todasLlaves = false;
+                    break;
+                }
             }
-        }
 
-        if (todasLlaves) {
-            if (heroe->posicion == salida) {
-                estadoJuego = Estado::GANADO;
+            if (todasLlaves) {
+                if (heroe->posicion == salida) {
+                    estadoJuego = Estado::GANADO;
+                }
+            }
+            else {
+                ui->desplegarTexto("Llaves restantes: " + std::to_string(NUM_LLAVES - llavesRecolectadas));
             }
         }
 
@@ -209,7 +225,12 @@ int main(int argc, char* argv[])
         perseguidor->perder();
     }
 
-    ui->leerTeclado();
+    // Detener el juego
+    do {
+        opcion = ui->leerTeclado();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    } while (opcion == Tecla::NADA);
 
 	return 0;
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #define CURSES
-#define DURACION_FRAME 60
+#define FPS 30
+#define DURACION_FRAME_MS (1 / FPS) * 1000
 
 #include "Common/Common.hpp"
 
