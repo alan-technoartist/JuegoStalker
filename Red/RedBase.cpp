@@ -1,4 +1,4 @@
-#include "RedBase.hpp"
+ #include "RedBase.hpp"
 
 RedBase::RedBase(std::shared_ptr<UI> ui) {
     this->ui = ui;
@@ -32,27 +32,40 @@ std::string imprimirDatos(const uint8_t* datos, int tamano) {
 
 void RedBase::enviarDatos(void* datos, int tamano) {
     // Asignar buffer
-    // TODO: verificar posibles condiciones de carrera
-    if (tamano > send_buf.size()) {
-        ui->desplegarTexto("Error al recibir datos");
-        return;
-    }
 
-    std::memcpy(send_buf.data(), datos, tamano);
+    {
+        // Mutex RAII
+        std::lock_guard<std::mutex> guard(mutex_send_buf); // mutex.lock()
+
+        if (tamano > send_buf.size()) {
+            ui->desplegarTexto("Error al recibir datos");
+            return;
+        }
+
+        std::memcpy(send_buf.data(), datos, tamano);
+
+    } // mutex.lock()
 
     std::string mensaje = "Enviando: " + imprimirDatos(send_buf.data(), tamano);
     ui->desplegarTexto(mensaje);
+
 }
 
 void RedBase::leerDatos(void* datos, int tamano) {
 
     // Copiar datos del buffer 
-    // TODO: verificar posibles condiciones de carrera
-   if (recv_buf.size() < tamano) {
-        ui->desplegarTexto("Error al recibir datos");
-        return;
-    }
-    std::memcpy(datos, recv_buf.data(), tamano);
+
+    {
+        // Mutex RAII
+        std::lock_guard<std::mutex> guard(mutex_recv_buf); // mutex.lock()
+
+        if (recv_buf.size() < tamano) {
+            ui->desplegarTexto("Error al recibir datos");
+            return;
+        }
+        std::memcpy(datos, recv_buf.data(), tamano);
+
+    } // mutex.lock()
 
     std::string mensaje = "Recibido: " + imprimirDatos(recv_buf.data(), tamano);
     ui->desplegarTexto(mensaje);
