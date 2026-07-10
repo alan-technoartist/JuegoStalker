@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
         heroe = std::make_shared<HeroeLocalSolo>(posicionInicialHeroe, ui, laberinto);
 
         // Perseguidor IA
-        perseguidor = std::make_shared<PerseguidorIA>(posicionInicialPerseguidor, ui, laberinto);
+        perseguidor = std::make_shared<PerseguidorIA>(posicionInicialPerseguidor, ui, laberinto, posicionInicialHeroe);
 
     }
     else if (opcion == Tecla::DOS) {

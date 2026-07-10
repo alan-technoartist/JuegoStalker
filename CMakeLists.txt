@@ -13,6 +13,15 @@ project ("JuegoStalker")
 
 find_package(unofficial-pdcurses REQUIRED)
 find_package(Boost REQUIRED)
+find_package(Doxygen)
+
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_EXTRACT_ALL "YES") 
+    set(DOXYGEN_HAVE_DOT "YES") # Para activar los diagramas de Graphviz
+    
+    # Target para compilar la documentación
+    doxygen_add_docs(docs ${CMAKE_CURRENT_SOURCE_DIR}  )
+endif()
 
 # Add source to this project's executable.
 add_executable (JuegoStalker
@@ -24,6 +33,19 @@ add_executable (JuegoStalker
 	"Red/ServidorRed.cpp"
 	"Red/ClienteRed.cpp"
  "Personaje/Heroe/HeroeRemoto.cpp" "Personaje/Perseguidor/PerseguidorHumanoLocal.cpp" "Personaje/Perseguidor/PerseguidorHumanoRemoto.cpp" "Personaje/Perseguidor/PerseguidorIA.cpp" "Red/RedBase.cpp" "Personaje/Heroe/HeroeLocalMulti.cpp")
+
+set(ONNX_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime/include")
+set(ONNX_LIB "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime/onnxruntime.lib")
+set(ONNX_DLL "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime/onnxruntime.dll")
+
+target_include_directories(JuegoStalker PRIVATE ${ONNX_INCLUDE_DIR})
+target_link_libraries(JuegoStalker PRIVATE ${ONNX_LIB})
+
+add_custom_command(TARGET JuegoStalker POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${ONNX_DLL}"
+    $<TARGET_FILE_DIR:JuegoStalker>
+)
 
 target_link_libraries(JuegoStalker PRIVATE unofficial::pdcurses::pdcurses)
 target_link_libraries(JuegoStalker PRIVATE Boost::headers)
