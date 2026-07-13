@@ -7,10 +7,12 @@ class PerseguidorIA : public Personaje {
 private:
 	void construirEntrada(std::array< float, LAB_HEIGHT* LAB_WIDTH + 4 >& datosEntrada);
 	Direccion ejecutarInferencia(std::array< float, LAB_HEIGHT* LAB_WIDTH + 4 > datosEntrada);
-
 	void moverLocal(Direccion dir);
 
 	Posicion posicionHeroe;
+	std::unique_ptr<Ort::Env> env;
+	std::unique_ptr<Ort::Session> session;
+	Ort::MemoryInfo memory_info{ nullptr };
 
 public:
 

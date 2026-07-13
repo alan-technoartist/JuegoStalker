@@ -3,6 +3,16 @@
 PerseguidorIA::PerseguidorIA(Posicion posicionInicial, std::shared_ptr<UI> ui, Laberinto& laberinto, Posicion posicionHeroe) :
  Personaje(posicionInicial, ui, laberinto) {
 	this->posicionHeroe = posicionHeroe;
+
+	// 1. Inicializar ONNX una sola vez
+	env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_WARNING, "ModeloStalker");
+	Ort::SessionOptions session_options;
+
+	std::string archivo_onnx = "stalker.onnx";
+	std::wstring model_path_w(archivo_onnx.begin(), archivo_onnx.end());
+
+	session = std::make_unique<Ort::Session>(*env, model_path_w.c_str(), session_options);
+	memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
 }
 
 PerseguidorIA::~PerseguidorIA() {
@@ -24,52 +34,45 @@ void PerseguidorIA::construirEntrada(std::array< float, LAB_HEIGHT* LAB_WIDTH + 
 		}
 	}
 
-    // Posición heroe
-	datosEntrada[441] = posicionHeroe.posicionX;
-	datosEntrada[442] = posicionHeroe.posicionY;
+	// Posición perseguidor
+	datosEntrada[441] = posicion.posicionX;
+	datosEntrada[442] = posicion.posicionY;
 
-    // Posición perseguidor
-	datosEntrada[443] = posicion.posicionX;
-	datosEntrada[443] = posicion.posicionY;
+    // Posición heroe
+	datosEntrada[443] = posicionHeroe.posicionX;
+	datosEntrada[444] = posicionHeroe.posicionY;
 
 }
 
 Direccion PerseguidorIA::ejecutarInferencia(std::array< float, LAB_HEIGHT* LAB_WIDTH + 4 > datosEntrada) {
+	Ort::AllocatorWithDefaultOptions allocator;
+	Ort::AllocatedStringPtr input_name_ptr = session->GetInputNameAllocated(0, allocator);
+	Ort::AllocatedStringPtr output_name_ptr = session->GetOutputNameAllocated(0, allocator);
+	const char* input_names[] = { input_name_ptr.get() };
+	const char* output_names[] = { output_name_ptr.get() };
 
-    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "ModeloStalker");
-    Ort::SessionOptions session_options;
-    std::unique_ptr<Ort::Session> session;
+	std::vector<int64_t> input_shape = { 1, LAB_HEIGHT * LAB_WIDTH + 4 };
 
-    std::string archivo_onnx = "stalker.onnx";
+	// Usamos el memory_info de la clase
+	Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
+		memory_info, datosEntrada.data(), datosEntrada.size(), input_shape.data(), input_shape.size());
 
-    // Configuración para soportar rutas en Windows
-    std::wstring model_path_w(archivo_onnx.begin(), archivo_onnx.end());
-    const wchar_t* model_path = model_path_w.c_str();
+	// Inferencia ligera
+	auto output_tensors = session->Run(
+		Ort::RunOptions{ nullptr }, input_names, &input_tensor, 1, output_names, 1);
 
-    session = std::make_unique<Ort::Session>(env, model_path, session_options);
+	float* output_data = output_tensors.front().GetTensorMutableData<float>();
 
-    Ort::AllocatorWithDefaultOptions allocator;
-    Ort::AllocatedStringPtr input_name_ptr = session->GetInputNameAllocated(0, allocator);
-    Ort::AllocatedStringPtr output_name_ptr = session->GetOutputNameAllocated(0, allocator);
-    const char* input_names[] = { input_name_ptr.get() };
-    const char* output_names[] = { output_name_ptr.get() };
+	int direccionInferida = 0;
+	float prob_maxima = output_data[0];
+	for (int i = 1; i < 4; ++i) {
+		if (output_data[i] > prob_maxima) {
+			prob_maxima = output_data[i];
+			direccionInferida = i;
+		}
+	}
 
-    // forma del tensor de entrada (laberinto, posiciones)
-    std::vector<int64_t> input_shape = { 1, LAB_HEIGHT * LAB_WIDTH + (sizeof(Posicion) * 2) }; 
-
-    auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-
-    // Vinculamos el tensor de ONNX directamente a nuestro vector 'datosEntrada' (cero copias)
-    Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
-        memory_info, datosEntrada.data(), datosEntrada.size(), input_shape.data(), input_shape.size());
-
-    auto output_tensors = session->Run(
-        Ort::RunOptions{ nullptr }, input_names, &input_tensor, 1, output_names, 1);
-
-    float* output_data = output_tensors.front().GetTensorMutableData<float>();
-
-    int64_t action = *output_tensors[0].GetTensorMutableData<int64_t>();
-    return static_cast<Direccion>(action);
+	return static_cast<Direccion>(direccionInferida);
 }
 
 

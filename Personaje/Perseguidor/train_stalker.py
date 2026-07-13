@@ -11,6 +11,7 @@ from collections import deque
 import random
 import sys
 import subprocess
+import time
 
 # =====================================================================
 # Parámetros
@@ -57,6 +58,25 @@ def generate_maze(seed):
 
     return grid
 
+def print_maze(grid, path=None, stalker=None, hero=None):
+    path = set(path or [])
+
+    for r in range(MAZE_SIZE):
+        row = ""
+        for c in range(MAZE_SIZE):
+
+            if stalker == (r, c):
+                row += "S"
+            elif hero == (r, c):
+                row += "H"
+            elif (r, c) in path:
+                row += "·"
+            elif grid[r][c] == 1:
+                row += "█"
+            else:
+                row += " "
+
+        print(row)
 
 def floor_cells(grid):
     """Devuelve todas las celdas navegables del grid."""
@@ -69,45 +89,62 @@ def floor_cells(grid):
 # =====================================================================
 def bfs_action(grid, stalker_r, stalker_c, hero_r, hero_c):
     """
-    Calcula el primer paso del camino más corto del stalker al hero.
-    Devuelve la acción (0-3) o None si no hay camino.
+    Devuelve:
+        action: acción óptima (0-3)
+        path: lista de celdas desde el stalker hasta el hero
     """
+
     if stalker_r == hero_r and stalker_c == hero_c:
-        return None
+        return None, []
 
     visited = [[False] * MAZE_SIZE for _ in range(MAZE_SIZE)]
-    prev    = [[None]  * MAZE_SIZE for _ in range(MAZE_SIZE)]
-    queue   = deque()
+    prev = [[None] * MAZE_SIZE for _ in range(MAZE_SIZE)]
 
+    queue = deque()
     queue.append((stalker_r, stalker_c))
     visited[stalker_r][stalker_c] = True
 
     while queue:
         r, c = queue.popleft()
 
-        if r == hero_r and c == hero_c:
-            # Reconstruir camino hasta el primer paso
-            cur = (r, c)
-            while prev[cur[0]][cur[1]] != (stalker_r, stalker_c):
+        if (r, c) == (hero_r, hero_c):
+
+            # Reconstruir camino completo
+            path = []
+            cur = (hero_r, hero_c)
+
+            while cur is not None:
+                path.append(cur)
                 cur = prev[cur[0]][cur[1]]
 
-            # Determinar acción según la dirección del primer paso
-            dr = cur[0] - stalker_r
-            dc = cur[1] - stalker_c
+            path.reverse()
+
+            # Primer movimiento
+            first = path[1]
+
+            dr = first[0] - stalker_r
+            dc = first[1] - stalker_c
+
             for action in range(4):
                 if MOVE_DR[action] == dr and MOVE_DC[action] == dc:
-                    return action
-            return None
+                    return action, path
+
+            return None, path
 
         for action in range(4):
-            nr, nc = r + MOVE_DR[action], c + MOVE_DC[action]
-            if (0 <= nr < MAZE_SIZE and 0 <= nc < MAZE_SIZE
-                    and not visited[nr][nc] and grid[nr][nc] == 0):
+            nr = r + MOVE_DR[action]
+            nc = c + MOVE_DC[action]
+
+            if (0 <= nr < MAZE_SIZE and
+                0 <= nc < MAZE_SIZE and
+                not visited[nr][nc] and
+                grid[nr][nc] == 0):
+
                 visited[nr][nc] = True
                 prev[nr][nc] = (r, c)
                 queue.append((nr, nc))
 
-    return None  # sin camino
+    return None, []
 
 
 # =====================================================================
@@ -155,7 +192,7 @@ def generate_dataset(n_samples):
             sr, sc = stalker_pos
             hr, hc = hero_pos
 
-            action = bfs_action(grid, sr, sc, hr, hc)
+            action, _ = bfs_action(grid, sr, sc, hr, hc)
             if action is None:
                 continue
 
@@ -179,7 +216,9 @@ def generate_dataset(n_samples):
 def build_model():
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(INPUT_SIZE,)),
-        tf.keras.layers.Dense(16, activation='relu'),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(128, activation='relu'),
         tf.keras.layers.Dense(4)  # Q-values
     ])
     return model
@@ -225,6 +264,29 @@ def export_onnx(model, path="stalker.onnx"):
 # Main
 # =====================================================================
 if __name__ == "__main__":
+
+    grid = generate_maze(0)
+
+    cells = floor_cells(grid)
+
+    stalker = random.choice(cells)
+    hero = random.choice(cells)
+
+    action, path = bfs_action(
+        grid,
+        stalker[0], stalker[1],
+        hero[0], hero[1]
+    )
+
+    print_maze(
+        grid,
+        path,
+        stalker,
+        hero
+    )
+
+    print("Acción:", action)
+
     print("Generando dataset...")
     X, y = generate_dataset(N_SAMPLES)
 

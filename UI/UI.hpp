@@ -3,9 +3,9 @@
 
 enum class Direccion {
 	ARRIBA = 0,
-	ABAJO,
-	IZQUIERDA,
-	DERECHA
+	ABAJO = 1,
+	IZQUIERDA = 2,
+	DERECHA = 3
 };
 
 enum class Tecla : unsigned int {
