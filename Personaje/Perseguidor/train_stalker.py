@@ -18,8 +18,8 @@ import time
 # =====================================================================
 MAZE_SIZE   = 21
 INPUT_SIZE  = 445   # 21*21 + 2 (stalker) + 2 (hero)
-N_SAMPLES   = 50000
-EPOCHS      = 10
+N_SAMPLES   = 100000
+EPOCHS      = 300
 BATCH_SIZE  = 64
 
 # Deltas de movimiento: arriba, abajo, izquierda, derecha
@@ -30,6 +30,69 @@ ACTION_DC = [ 0, 0, -2, 2]
 MOVE_DR = [-1, 1,  0, 0]
 MOVE_DC = [ 0, 0, -1, 1]
 
+class VisualizadorIA(tf.keras.callbacks.Callback):
+    def __init__(self, X_data):
+        super().__init__()
+        self.X_data = X_data  # Guardamos referencia al dataset real
+
+    def on_epoch_end(self, epoch, logs=None):
+        if epoch != 0 and (epoch + 1) % 5 != 0:
+            return
+
+        print(f"\n\n--- Simulando con datos REALES de entrenamiento (Época {epoch + 1}) ---")
+        
+        # 1. Tomamos un tensor aleatorio directamente de tu variable X
+        idx = random.randint(0, len(self.X_data) - 1)
+        muestra = self.X_data[idx]
+        
+        # 2. Ingeniería inversa: Reconstruimos el grid de 21x21 a partir de los primeros 441 elementos
+        grid_plano = muestra[:441]
+        test_grid = grid_plano.reshape((MAZE_SIZE, MAZE_SIZE)).tolist()
+        
+        # 3. Ingeniería inversa: Des-normalizamos las coordenadas (* MAZE_SIZE)
+        stalker_r = int(round(muestra[441] * MAZE_SIZE))
+        stalker_c = int(round(muestra[442] * MAZE_SIZE))
+        hero_r = int(round(muestra[443] * MAZE_SIZE))
+        hero_c = int(round(muestra[444] * MAZE_SIZE))
+        
+        stalker_start = (stalker_r, stalker_c)
+        hero_start = (hero_r, hero_c)
+        
+        current_pos = stalker_start
+        path = [current_pos]
+        
+        for paso in range(40):
+            if current_pos == hero_start:
+                print("¡ÉXITO! El modelo encontró al héroe.")
+                break
+                
+            # Reconstruimos la entrada para predecir el siguiente paso
+            entrada = build_input(test_grid, current_pos[0], current_pos[1], 
+                                  hero_start[0], hero_start[1])
+            
+            entrada_lote = np.expand_dims(entrada, axis=0)
+            
+            prediccion = self.model.predict(entrada_lote, verbose=0)[0]
+            accion = np.argmax(prediccion)
+            
+            nr = current_pos[0] + MOVE_DR[accion]
+            nc = current_pos[1] + MOVE_DC[accion]
+            
+            if nr < 0 or nr >= MAZE_SIZE or nc < 0 or nc >= MAZE_SIZE or test_grid[nr][nc] == 1.0:
+                print(f"FALLO: El modelo intentó chocar contra una pared en el paso {paso+1}.")
+                break
+                
+            current_pos = (nr, nc)
+            
+            if current_pos in path:
+                path.append(current_pos)
+                print(f"BUCLE: El modelo osciló y se quedó atascado en el paso {paso+1}.")
+                break
+                
+            path.append(current_pos)
+        
+        print_maze(test_grid, path, stalker_start, hero_start)
+        print("-" * 60 + "\n")
 
 # =====================================================================
 # Generación de laberinto — Recursive Backtracking
@@ -82,7 +145,6 @@ def floor_cells(grid):
     """Devuelve todas las celdas navegables del grid."""
     return [(r, c) for r in range(MAZE_SIZE) for c in range(MAZE_SIZE)
             if grid[r][c] == 0]
-
 
 # =====================================================================
 # BFS — experto que calcula la acción óptima del stalker hacia el hero
@@ -153,16 +215,15 @@ def bfs_action(grid, stalker_r, stalker_c, hero_r, hero_c):
 def build_input(grid, stalker_r, stalker_c, hero_r, hero_c):
     data = np.zeros(INPUT_SIZE, dtype=np.float32)
 
-    # Grid aplanado
-    for r in range(MAZE_SIZE):
-        for c in range(MAZE_SIZE):
-            data[r * MAZE_SIZE + c] = float(grid[r][c])
+    # Reemplaza el doble bucle 'for' con esta operación vectorizada de NumPy:
+    # Aplanamos el grid y lo asignamos a los primeros 441 espacios
+    data[:441] = np.array(grid, dtype=np.float32).flatten()
 
-    # Posiciones
-    data[441] = float(stalker_r)
-    data[442] = float(stalker_c)
-    data[443] = float(hero_r)
-    data[444] = float(hero_c)
+    # Posiciones NORMALIZADAS
+    data[441] = float(stalker_r) / MAZE_SIZE
+    data[442] = float(stalker_c) / MAZE_SIZE
+    data[443] = float(hero_r) / MAZE_SIZE
+    data[444] = float(hero_c) / MAZE_SIZE
 
     return data
 
@@ -216,10 +277,21 @@ def generate_dataset(n_samples):
 def build_model():
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(INPUT_SIZE,)),
+        
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.3), # <--- VITAL: Apaga 30% de neuronas
+        
         tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.3), # <--- VITAL
+        
         tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        
         tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(4)  # Q-values
+        
+        tf.keras.layers.Dense(4)  # Salida
     ])
     return model
 
@@ -228,12 +300,26 @@ def build_model():
 # Entrenamiento
 # =====================================================================
 def train(model, X, y):
+    custom_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+
     model.compile(
-        optimizer='adam',
+        optimizer=custom_optimizer,
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=['accuracy']
     )
-    model.fit(X, y, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_split=0.1)
+    
+    early_stop = tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss', 
+        patience=15, 
+        restore_best_weights=True
+    )
+    
+    # LE PASAMOS EL DATASET 'X' AL CALLBACK AQUÍ
+    visualizador = VisualizadorIA(X)
+    
+    model.fit(X, y, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_split=0.1, 
+              callbacks=[early_stop, visualizador])
+    
     return model
 
 
@@ -285,19 +371,16 @@ if __name__ == "__main__":
         hero
     )
 
-    print("Acción:", action)
+    #build_input(grid, stalker[0], stalker[1], hero[0], hero[1])
 
     print("Generando dataset...")
     X, y = generate_dataset(N_SAMPLES)
 
     print("Entrenando modelo...")
     model = build_model()
+    
+    # CORRECCIÓN AQUÍ: Solo pasamos model, X y y
     model = train(model, X, y)
-
-    print("TensorFlow:", tf.__version__)
-    print("Keras:", tf.keras.__version__)
-    print("tf2onnx:", tf2onnx.__version__)
-
 
     print("Exportando a ONNX...")
     export_onnx(model)

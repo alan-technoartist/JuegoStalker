@@ -1,8 +1,8 @@
 ﻿#pragma once
-#define CURSES
-#define FPS 30
-#define DURACION_FRAME_MS (1 / FPS) * 1000
 
+#define CURSES
+
+#include <thread>
 #include "Common/Common.hpp"
 
 #include "Laberinto/Laberinto.hpp"
@@ -22,3 +22,7 @@
 #elif QT
 //#include "UI/UIQT.hpp"
 #endif
+
+const int TARGET_FPS = 30;
+const std::chrono::milliseconds duracionFrame(1000 / TARGET_FPS); // ~33ms por frame
+const int FRAMES_ESPERA_STALKER = 15;

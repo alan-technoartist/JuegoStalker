@@ -93,7 +93,9 @@ int main(int argc, char* argv[])
          std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     } while (opcion == Tecla::NADA);
+
     clear();
+
     if (opcion == Tecla::UNO) {
         // Un solo jugador
 
@@ -112,7 +114,7 @@ int main(int argc, char* argv[])
         heroe = std::make_shared<HeroeLocalSolo>(posicionInicialHeroe, ui, laberinto);
 
         // Perseguidor IA
-        perseguidor = std::make_shared<PerseguidorIA>(posicionInicialPerseguidor, ui, laberinto, posicionInicialHeroe);
+        perseguidor = std::make_shared<PerseguidorIA>(posicionInicialPerseguidor, ui, laberinto, heroe);
 
     }
     else if (opcion == Tecla::DOS) {
@@ -173,15 +175,25 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-	// Game loop
-	while(estadoJuego == Estado::JUGANDO) {
-        heroe->mover();
-        perseguidor->mover();
+    int contadorFrames = 0;
 
+	// Game loop
+    while (estadoJuego == Estado::JUGANDO) {
+        // Marcar el inicio del frame
+        auto inicioFrame = std::chrono::steady_clock::now();
+
+        heroe->mover();
+
+        if (contadorFrames % FRAMES_ESPERA_STALKER == 0) {
+            perseguidor->mover();
+        }
+
+        // Lógica de Colisiones
         if (heroe->posicion == perseguidor->posicion) {
             estadoJuego = Estado::PERDIDO;
         }
 
+        // Lógica de Llaves y Salida
         if (estadoJuego != Estado::PERDIDO) {
             for (int i = 0; i < NUM_LLAVES; i++) {
                 if (heroe->posicion == llaves[i].posicion && llaves[i].recolectada != true) {
@@ -208,11 +220,21 @@ int main(int argc, char* argv[])
             }
         }
 
+        // Dibujar en pantalla
         ui->render();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // Aumentar el reloj interno
+        contadorFrames++;
 
-	}
+        // CÁLCULO DE FPS EXACTOS
+        auto finFrame = std::chrono::steady_clock::now();
+        auto tiempoTranscurrido = std::chrono::duration_cast<std::chrono::milliseconds>(finFrame - inicioFrame);
+
+        // Si nos sobró tiempo, dormimos el hilo
+        if (tiempoTranscurrido < duracionFrame) {
+            std::this_thread::sleep_for(duracionFrame - tiempoTranscurrido);
+        }
+    }
     // Termina el juego
 
     if (estadoJuego == Estado::PERDIDO) {

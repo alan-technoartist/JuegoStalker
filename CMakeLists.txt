@@ -16,11 +16,19 @@ find_package(Boost REQUIRED)
 find_package(Doxygen)
 
 if(DOXYGEN_FOUND)
-    set(DOXYGEN_EXTRACT_ALL "YES") 
+   # set(DOXYGEN_EXTRACT_ALL "YES") 
     set(DOXYGEN_HAVE_DOT "YES") # Para activar los diagramas de Graphviz
-    
+    set(DOXYGEN_CLASS_DIAGRAMS "YES")
+	set(DOXYGEN_COLLABORATION_DIAGRAMS "YES")
+	set(DOXYGEN_CALL_GRAPH "YES")
+	set(DOXYGEN_CALLER_GRAPH "YES")
+
     # Target para compilar la documentación
-    doxygen_add_docs(docs ${CMAKE_CURRENT_SOURCE_DIR}  )
+    doxygen_add_docs(docs
+		EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime"
+
+		${CMAKE_CURRENT_SOURCE_DIR}
+	)
 endif()
 
 # Add source to this project's executable.

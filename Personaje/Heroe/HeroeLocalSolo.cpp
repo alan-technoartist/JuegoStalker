@@ -81,6 +81,11 @@ void HeroeLocalSolo::mover() {
 	}
 }
 
+Posicion HeroeLocalSolo::obtenerPosicion() {
+	return this->posicion;
+}
+
+
 void HeroeLocalSolo::perder() {
 	ui->desplegarTexto("========PERDISTE========");
 }
