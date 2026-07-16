@@ -1,0 +1,5 @@
+<map id="PerseguidorHumanoRemoto" name="PerseguidorHumanoRemoto">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,251,201,384"/>
+<area shape="rect" id="Node000002" href="$class_personaje.html" title=" " alt="" coords="54,5,152,203"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,215,106,252,101,250,102,220"/>
+</map>

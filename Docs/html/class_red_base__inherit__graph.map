@@ -1,0 +1,7 @@
+<map id="RedBase" name="RedBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="47,5,184,373"/>
+<area shape="rect" id="Node000002" href="$class_cliente_red.html" title=" " alt="" coords="5,421,102,533"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,385,68,422,63,421,72,390"/>
+<area shape="rect" id="Node000003" href="$class_servidor_red.html" title=" " alt="" coords="126,421,230,533"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,386,168,422,163,421,157,390"/>
+</map>

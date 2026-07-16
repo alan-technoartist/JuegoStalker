@@ -1,0 +1,5 @@
+<map id="HeroeLocalMulti" name="HeroeLocalMulti">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,251,131,405"/>
+<area shape="rect" id="Node000002" href="$class_personaje.html" title=" " alt="" coords="19,5,117,203"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,215,71,251,66,251,68,220"/>
+</map>

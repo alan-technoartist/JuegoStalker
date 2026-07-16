@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_personaje.html" title=" " alt="" coords="5,132,85,159"/>
+<area shape="rect" id="Node000001" href="$class_heroe_local_multi.html" title=" " alt="" coords="168,5,283,32"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="60,117,90,78,109,58,131,42,169,27,165,31,134,46,113,62,94,82,65,120"/>
+<area shape="rect" id="Node000002" href="$class_heroe_local_solo.html" title=" " alt="" coords="169,56,282,83"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="78,121,132,92,170,81,166,84,134,97,81,125"/>
+<area shape="rect" id="Node000003" href="$class_heroe_remoto.html" title=" " alt="" coords="174,107,276,133"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="99,135,176,125,172,129,101,140"/>
+<area shape="rect" id="Node000004" href="$class_perseguidor_humano_local.html" title=" " alt="" coords="140,157,310,184"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="100,150,142,157,137,160,101,156"/>
+<area shape="rect" id="Node000005" href="$class_perseguidor_humano_remoto.html" title=" " alt="" coords="133,208,318,235"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="79,165,134,194,168,207,163,208,132,198,79,170"/>
+<area shape="rect" id="Node000006" href="$class_perseguidor_i_a.html" title=" " alt="" coords="174,259,277,285"/>
+<area shape="poly" id="edge6_Node000000_Node000006" title=" " alt="" coords="63,169,94,209,113,228,134,244,176,263,171,264,131,249,109,232,90,213,62,175"/>
+</map>

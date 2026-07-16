@@ -1,0 +1,5 @@
+<map id="train_stalker.floor_cells" name="train_stalker.floor_cells">
+<area shape="rect" id="Node000001" title=" " alt="" coords="200,5,321,48"/>
+<area shape="rect" id="Node000002" href="$namespacetrain__stalker.html#a3978d753ee8aa12877e94fe9a694c354" title=" " alt="" coords="5,5,152,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,27,152,29,152,24,187,26"/>
+</map>

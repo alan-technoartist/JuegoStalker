@@ -1,0 +1,10 @@
+<map id="PerseguidorHumanoRemoto" name="PerseguidorHumanoRemoto">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,791,201,924"/>
+<area shape="rect" id="Node000002" href="$class_personaje.html" title=" " alt="" coords="54,587,152,741"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,754,106,791,101,790,102,759"/>
+<area shape="rect" id="Node000003" href="$class_laberinto.html" title=" " alt="" coords="141,189,284,515"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="157,512,138,572,133,570,155,517"/>
+<area shape="rect" id="Node000004" href="$struct_posicion.html" title=" " alt="" coords="26,5,122,96"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="69,98,64,174,59,279,58,396,67,514,78,570,73,571,62,515,53,396,53,279,59,174,69,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,93,137,181,132,182,94,98"/>
+</map>

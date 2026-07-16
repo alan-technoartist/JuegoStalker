@@ -1,0 +1,7 @@
+<map id="train_stalker.build_input" name="train_stalker.build_input">
+<area shape="rect" id="Node000001" title=" " alt="" coords="221,39,344,81"/>
+<area shape="rect" id="Node000002" href="$namespacetrain__stalker.html#a3978d753ee8aa12877e94fe9a694c354" title=" " alt="" coords="16,5,162,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,47,163,42,162,37,208,46"/>
+<area shape="rect" id="Node000003" href="$classtrain__stalker_1_1_visualizador_i_a.html#ae208a394014911a91f7667a715df22ca" title=" " alt="" coords="5,72,173,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,74,174,81,173,76,208,73"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="train_stalker.generate_dataset" name="train_stalker.generate_dataset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,89,152,132"/>
+<area shape="rect" id="Node000002" href="$namespacetrain__stalker.html#a945cc69d27f377a2df1edcc1b9e89a27" title=" " alt="" coords="214,5,370,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,87,153,63,199,42,221,36,216,38,201,46,155,68,115,91"/>
+<area shape="rect" id="Node000003" href="$namespacetrain__stalker.html#a52414364f30978137ad7da35beb98148" title=" " alt="" coords="231,56,354,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,97,218,88,213,91,153,102"/>
+<area shape="rect" id="Node000004" href="$namespacetrain__stalker.html#ac09b0ced32887afbcc0dab9b94cc7346" title=" " alt="" coords="232,123,353,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="152,119,219,131,214,133,152,125"/>
+<area shape="rect" id="Node000005" href="$namespacetrain__stalker.html#a4b166e12e6e0890193be74f2e77ca1c4" title=" " alt="" coords="200,189,385,216"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="114,130,155,153,201,175,221,184,216,184,199,180,153,158,113,135"/>
+</map>

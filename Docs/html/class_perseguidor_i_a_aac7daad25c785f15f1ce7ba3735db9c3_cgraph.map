@@ -1,0 +1,7 @@
+<map id="PerseguidorIA::mover" name="PerseguidorIA::mover">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,153,69"/>
+<area shape="rect" id="Node000002" href="$class_perseguidor_i_a.html#a3930e4278c8114da2506cf08d0db0b92" title=" " alt="" coords="201,5,389,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,43,188,41,183,42,154,49"/>
+<area shape="rect" id="Node000003" href="$class_perseguidor_i_a.html#ac33f1d2d2349cb01a0c5410787343af0" title=" " alt="" coords="206,72,384,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,63,193,71,187,71,153,69"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="PerseguidorIA" name="PerseguidorIA">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,791,207,988"/>
+<area shape="rect" id="Node000002" href="$class_personaje.html" title=" " alt="" coords="57,587,155,741"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,753,109,791,104,791,106,758"/>
+<area shape="rect" id="Node000003" href="$class_laberinto.html" title=" " alt="" coords="144,189,287,515"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="158,517,141,572,136,570,160,512"/>
+<area shape="rect" id="Node000004" href="$struct_posicion.html" title=" " alt="" coords="30,5,124,96"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="72,98,67,174,62,279,61,396,70,514,81,570,76,571,65,515,56,396,56,279,62,174,72,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="97,93,140,181,135,182,97,98"/>
+</map>

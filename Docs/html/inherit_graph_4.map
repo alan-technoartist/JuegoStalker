@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_red_base.html" title=" " alt="" coords="5,31,81,57"/>
+<area shape="rect" id="Node000001" href="$class_cliente_red.html" title=" " alt="" coords="132,5,218,32"/>
+<area shape="poly" id="edge7_Node000000_Node000001" title=" " alt="" coords="95,31,134,26,129,28,97,36"/>
+<area shape="rect" id="Node000002" href="$class_servidor_red.html" title=" " alt="" coords="129,56,222,83"/>
+<area shape="poly" id="edge8_Node000000_Node000002" title=" " alt="" coords="96,51,131,60,126,61,96,57"/>
+</map>

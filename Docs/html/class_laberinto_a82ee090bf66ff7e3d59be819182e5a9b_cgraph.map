@@ -1,0 +1,8 @@
+<map id="Laberinto::generar" name="Laberinto::generar">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,131,81"/>
+<area shape="rect" id="Node000002" href="$class_laberinto.html#acee5c1311cc5900ae0bbeb09d0e7a1fb" title=" " alt="" coords="179,29,342,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,57,166,55,161,56,131,62"/>
+<area shape="rect" id="Node000003" href="$class_laberinto.html#a7214de2389d7c081861caf0d282c8c04" title=" " alt="" coords="186,80,334,107"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="131,74,173,81,168,82,131,79"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="227,28,222,21,226,11,239,5,260,3,283,5,297,14,292,14,282,10,260,8,240,10,230,15,227,20,232,30"/>
+</map>

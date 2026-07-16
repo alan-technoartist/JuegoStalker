@@ -1,0 +1,7 @@
+<map id="Laberinto::obtenerCasillaLibre" name="Laberinto::obtenerCasillaLibre">
+<area shape="rect" id="Node000001" title=" " alt="" coords="290,5,455,48"/>
+<area shape="rect" id="Node000002" href="$_juego_stalker_8cpp.html#a51bd1791d70cd697f0acb56f818c37d9" title=" " alt="" coords="103,13,242,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="272,27,243,29,242,24,277,27"/>
+<area shape="rect" id="Node000003" href="$_juego_stalker_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,13,55,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,28,55,29,55,24,90,26"/>
+</map>

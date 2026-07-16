@@ -1,0 +1,9 @@
+<map id="Personaje/Heroe/HeroeLocalMulti.hpp" name="Personaje/Heroe/HeroeLocalMulti.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="62,5,250,48"/>
+<area shape="rect" id="Node000002" href="$_juego_stalker_8hpp.html" title=" " alt="" coords="5,104,128,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,61,81,105,77,102,126,57"/>
+<area shape="rect" id="Node000004" href="$_heroe_local_multi_8cpp.html" title=" " alt="" coords="152,96,341,139"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="188,56,228,95,223,96,187,62"/>
+<area shape="rect" id="Node000003" href="$_juego_stalker_8cpp.html" title=" " alt="" coords="5,187,128,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="69,145,69,187,64,186,64,148"/>
+</map>

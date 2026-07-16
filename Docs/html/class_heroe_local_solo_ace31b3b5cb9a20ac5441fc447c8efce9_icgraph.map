@@ -1,0 +1,5 @@
+<map id="HeroeLocalSolo::moverLocal" name="HeroeLocalSolo::moverLocal">
+<area shape="rect" id="Node000001" title=" " alt="" coords="211,5,399,32"/>
+<area shape="rect" id="Node000002" href="$class_heroe_local_solo.html#aee4916b0a3063147d89cc4e3c6789d9f" title=" " alt="" coords="5,5,163,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,19,163,21,163,16,198,19"/>
+</map>

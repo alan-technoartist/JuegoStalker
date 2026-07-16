@@ -15,6 +15,7 @@ PerseguidorIA::PerseguidorIA(Posicion posicionInicial, std::shared_ptr<UI> ui, L
 	session = std::make_unique<Ort::Session>(*env, model_path_w.c_str(), session_options);
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
 #endif
+
 }
 
 PerseguidorIA::~PerseguidorIA() {
@@ -133,9 +134,6 @@ Direccion PerseguidorIA::calcularMejorMovimientoBFS() {
 	// Si el héroe está encerrado en muros (no hay ruta), nos quedamos quietos
 	if (!heroeEncontrado) return Direccion::ARRIBA;
 
-	// =================================================================
-	// RECONSTRUIR EL CAMINO (De reversa desde el héroe hasta el stalker)
-	// =================================================================
 	int currX = targetX;
 	int currY = targetY;
 
@@ -252,7 +250,6 @@ void PerseguidorIA::mover() {
 
 #endif
 
-	// Ejecutamos (Tu método moverLocal se queda intacto)
 	moverLocal(direccion);
 }
 

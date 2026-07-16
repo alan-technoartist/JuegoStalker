@@ -1,0 +1,5 @@
+<map id="HeroeLocalMulti::mover" name="HeroeLocalMulti::mover">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,165,32"/>
+<area shape="rect" id="Node000002" href="$class_heroe_local_multi.html#ab1e2393ca2d7a5ddbc94c83ab1d99515" title=" " alt="" coords="213,5,403,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,16,200,19,194,19,165,21"/>
+</map>

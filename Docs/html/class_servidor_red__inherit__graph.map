@@ -1,0 +1,5 @@
+<map id="ServidorRed" name="ServidorRed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,421,126,533"/>
+<area shape="rect" id="Node000002" href="$class_red_base.html" title=" " alt="" coords="5,5,142,373"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,386,76,422,71,421,73,391"/>
+</map>

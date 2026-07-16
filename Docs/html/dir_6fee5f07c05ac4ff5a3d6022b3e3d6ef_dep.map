@@ -1,0 +1,10 @@
+<map id="Personaje/Perseguidor" name="Personaje/Perseguidor">
+<area shape="rect" id="node1" href="dir_68c345346a5ee873a1c65f8903499720.html" title="Heroe" alt="" coords="44,128,100,155"/>
+<area shape="rect" id="node2" href="dir_6fee5f07c05ac4ff5a3d6022b3e3d6ef.html" title="Perseguidor" alt="" coords="27,53,117,80"/>
+<area shape="poly" id="edge1" href="dir_000003_000001.html" alt="" coords="73,78,75,113,69,112,71,83"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000003_000001.html" title="1" alt="" coords="77,101,84,117"/>
+<area shape="rect" id="node3" href="dir_e6704ba265bd533c5eb4da075c6f4409.html" title="Red" alt="" coords="139,128,184,155"/>
+<area shape="poly" id="edge2" href="dir_000003_000005.html" alt="" coords="88,78,137,117,132,119,87,83"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000003_000005.html" title="2" alt="" coords="134,102,141,118"/>
+<area shape="rect" id="clust1" href="dir_5c61ce3247d1e0e9d37e8ed2e0cea285.html" title="Personaje" alt="" coords="16,16,128,165"/>
+</map>
