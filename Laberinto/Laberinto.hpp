@@ -4,11 +4,6 @@
 #include "../Common/Common.hpp"
 #include "../UI/UI.hpp"
 
-// Dimensiones del mapa del juego
-const int LAB_WIDTH = 21;
-const int LAB_HEIGHT = 21;
-const int NUM_LLAVES = 3;
-
 class Laberinto {
 private:
     // Matriz que representa el laberinto

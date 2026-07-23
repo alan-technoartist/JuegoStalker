@@ -1,27 +1,29 @@
-﻿
-#include "JuegoStalker.hpp"
-
-// TODO: Replace for UI class
+﻿#include "JuegoStalker.hpp"
 #include <iostream>
 
-void inicializarPosiciones(Laberinto& laberinto,
-                           std::shared_ptr<UI> ui,
-                           uint32_t semillaInicial,
-                           Posicion& posicionInicialHeroe,
-                           Posicion& posicionInicialPerseguidor,
-                           Llave* llaves,
-                           Posicion& salida
-) {
+#ifdef CURSES
+#include "UI/UINcurses.hpp"
+#elif defined(QT)
+#include "UI/UIQT.hpp"
+#include <QApplication>
+#include <QTimer>
+#endif
 
+void inicializarPosiciones(Laberinto& laberinto,
+    std::shared_ptr<UI> ui,
+    uint32_t semillaInicial,
+    Posicion& posicionInicialHeroe,
+    Posicion& posicionInicialPerseguidor,
+    Llave* llaves,
+    Posicion& salida)
+{
     posicionInicialHeroe = laberinto.obtenerCasillaLibre();
     ui->actualizarEntidad(posicionInicialHeroe.posicionX, posicionInicialHeroe.posicionY, TipoEntidad::HEROE);
 
     do {
         posicionInicialPerseguidor = laberinto.obtenerCasillaLibre();
-
     } while (posicionInicialPerseguidor == posicionInicialHeroe);
     ui->actualizarEntidad(posicionInicialPerseguidor.posicionX, posicionInicialPerseguidor.posicionY, TipoEntidad::PERSEGUIDOR);
-
 
     for (int i = 0; i < NUM_LLAVES; i++) {
         do {
@@ -38,221 +40,234 @@ void inicializarPosiciones(Laberinto& laberinto,
     do {
         salida = laberinto.obtenerCasillaLibre();
     } while (salida == llaves[0].posicion ||
-             salida == llaves[1].posicion ||
-             salida == llaves[2].posicion);
+        salida == llaves[1].posicion ||
+        salida == llaves[2].posicion);
     laberinto.salida = salida;
     ui->actualizarEntidad(salida.posicionX, salida.posicionY, TipoEntidad::SALIDA);
-
 }
 
+
+// =====================================================================
+// Estado global del juego — necesario para el QTimer callback
+// =====================================================================
+struct EstadoPartida {
+    std::shared_ptr<UI>        ui;
+    std::shared_ptr<Personaje> heroe;
+    std::shared_ptr<Personaje> perseguidor;
+    Llave                      llaves[NUM_LLAVES];
+    Posicion                   salida;
+    Estado                     estadoJuego = Estado::JUGANDO;
+    int                        contadorFrames = 0;
+    int                        llavesRecolectadas = 0;
+};
+
+// Un frame del game loop — mismo código en Qt y ncurses
+bool ejecutarFrame(EstadoPartida& p)
+{
+    p.heroe->mover();
+
+    if (p.contadorFrames % FRAMES_ESPERA_STALKER == 0)
+        p.perseguidor->mover();
+
+    // Colisiones
+    if (p.heroe->posicion == p.perseguidor->posicion)
+        p.estadoJuego = Estado::PERDIDO;
+
+    // Llaves y salida
+    if (p.estadoJuego != Estado::PERDIDO) {
+        for (int i = 0; i < NUM_LLAVES; i++) {
+            if (p.heroe->posicion == p.llaves[i].posicion && !p.llaves[i].recolectada) {
+                p.llaves[i].recolectada = true;
+                p.llavesRecolectadas++;
+            }
+        }
+
+        bool todasLlaves = true;
+        for (int i = 0; i < NUM_LLAVES; i++) {
+            if (!p.llaves[i].recolectada) { todasLlaves = false; break; }
+        }
+
+        if (todasLlaves) {
+            if (p.heroe->posicion == p.salida)
+                p.estadoJuego = Estado::GANADO;
+        }
+        else {
+            p.ui->desplegarTexto("Llaves restantes: " +
+                std::to_string(NUM_LLAVES - p.llavesRecolectadas));
+        }
+    }
+
+    p.ui->render();
+    p.contadorFrames++;
+
+    return p.estadoJuego == Estado::JUGANDO;
+}
+
+void terminarJuego(EstadoPartida& p)
+{
+    if (p.estadoJuego == Estado::PERDIDO) {
+        p.heroe->perder();
+        p.perseguidor->ganar();
+    }
+    else if (p.estadoJuego == Estado::GANADO) {
+        p.heroe->ganar();
+        p.perseguidor->perder();
+    }
+}
+
+
+// =====================================================================
+// Main
+// =====================================================================
 int main(int argc, char* argv[])
 {
-
+    // -----------------------------------------------------------------
+    // 1. Crear UI según el backend compilado
+    // -----------------------------------------------------------------
     std::shared_ptr<UI> ui;
 
 #ifdef CURSES
     ui = std::make_shared<UINcurses>();
-#elif QT
-    //	ui = std::make_shared<UIQT>();
+#elif defined(QT)
+    QApplication app(argc, argv);
+    ui = std::make_shared<QtUI>();
 #else
-    if (ui == nullptr) {
-        std::cout << "Ninguna biblioteca de UI disponible" << std::endl;
-        return -1;
-    }
+    std::cout << "Ninguna biblioteca de UI disponible" << std::endl;
+    return -1;
 #endif
 
-    Laberinto laberinto(ui);
-
-    std::shared_ptr<Personaje> heroe;
-    std::shared_ptr<Personaje> perseguidor;
-
-    // Fuente de entropía
-    std::random_device fuente;
-
-    // Semilla inicial única
-    uint32_t semillaInicial;
-
-    Posicion posicionInicialHeroe;
-    Posicion posicionInicialPerseguidor;
-    Llave llaves[3];
-    int llavesRecolectadas = 0;
-
-    Posicion salida;
-    Estado estadoJuego = Estado::JUGANDO;
-
-
-    ui->desplegarTexto("Esperando entrada del usuario");
-    //ui->desplegarTexto("1 - Jugador unico");
-    //ui->desplegarTexto("2 - Multijugador (heroe)");
-    //ui->desplegarTexto("3 - Multijugador (perseguidor)");
-    //ui->desplegarTexto("4 - Salir");
+    // -----------------------------------------------------------------
+    // 2. Menú inicial — igual en ambos backends
+    // -----------------------------------------------------------------
+    ui->desplegarTexto("1-Solo  2-Multi(heroe)  3-Multi(perseguidor)  4-Salir");
 
     Tecla opcion;
     do {
-         opcion = ui->leerTeclado();
-         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+        opcion = ui->leerTeclado();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+#ifdef QT
+        // Qt necesita procesar eventos mientras espera input
+        QApplication::processEvents();
+#endif
     } while (opcion == Tecla::NADA);
 
-    clear();
+#ifdef CURSES
+    clear();  // solo ncurses
+#endif
+
+    if (opcion == Tecla::CUATRO)
+        return 0;
+
+    // -----------------------------------------------------------------
+    // 3. Inicializar partida
+    // -----------------------------------------------------------------
+    auto p = std::make_shared<EstadoPartida>();
+    p->ui = ui;
+
+    std::random_device fuente;
+    uint32_t semillaInicial;
+    Laberinto laberinto(ui);
 
     if (opcion == Tecla::UNO) {
-        // Un solo jugador
-
-        // Generar semilla inicial
         semillaInicial = fuente();
-    
         laberinto.iniciarMotor(semillaInicial);
         laberinto.generar();
-
         laberinto.dibujar();
 
-        inicializarPosiciones(laberinto, ui, semillaInicial, posicionInicialHeroe, posicionInicialPerseguidor,
-            llaves, salida);
+        Posicion ph, pp;
+        inicializarPosiciones(laberinto, ui, semillaInicial, ph, pp, p->llaves, p->salida);
 
-        // Local (teclado)
-        heroe = std::make_shared<HeroeLocalSolo>(posicionInicialHeroe, ui, laberinto);
-
-        // Perseguidor IA
-        perseguidor = std::make_shared<PerseguidorIA>(posicionInicialPerseguidor, ui, laberinto, heroe);
-
+        p->heroe = std::make_shared<HeroeLocalSolo>(ph, ui, laberinto);
+        p->perseguidor = std::make_shared<PerseguidorIA>(pp, ui, laberinto, p->heroe);
     }
     else if (opcion == Tecla::DOS) {
-        // Multijugador (heroe)
-
-        // Generar semilla inicial
         semillaInicial = fuente();
-
-        // Servidor de red para recibir al jugador remoto
         auto red = std::make_shared<ServidorRed>(ui);
         red->inicializar(sizeof(Posicion));
-
-        // Mandar semilla inicial al jugador remoto
         red->enviarDatos_sync(&semillaInicial, sizeof(semillaInicial));
 
         laberinto.iniciarMotor(semillaInicial);
         laberinto.generar();
-
         laberinto.dibujar();
 
-        inicializarPosiciones(laberinto, ui, semillaInicial, posicionInicialHeroe, posicionInicialPerseguidor,
-            llaves, salida);
+        Posicion ph, pp;
+        inicializarPosiciones(laberinto, ui, semillaInicial, ph, pp, p->llaves, p->salida);
 
-        // Local (teclado) + red
-        heroe = std::make_shared<HeroeLocalMulti>(posicionInicialHeroe, ui, laberinto, red);
-
-        // Perseguidor humano remoto
-        perseguidor = std::make_shared<PerseguidorHumanoRemoto>(posicionInicialPerseguidor, ui, laberinto, red);
-
+        p->heroe = std::make_shared<HeroeLocalMulti>(ph, ui, laberinto, red);
+        p->perseguidor = std::make_shared<PerseguidorHumanoRemoto>(pp, ui, laberinto, red);
     }
     else if (opcion == Tecla::TRES) {
-        // Multijugador (perseguidor)
-
-        // Cliente de red para conectarse a la partida
         auto red = std::make_shared<ClienteRed>(ui);
         red->inicializar(sizeof(Posicion));
-
-        // Obtener la semilla inicial del server
         red->leerDatos_sync(&semillaInicial, sizeof(semillaInicial));
 
         laberinto.iniciarMotor(semillaInicial);
         laberinto.generar();
-
         laberinto.dibujar();
 
-        inicializarPosiciones(laberinto, ui, semillaInicial, posicionInicialHeroe, posicionInicialPerseguidor,
-            llaves, salida);
+        Posicion ph, pp;
+        inicializarPosiciones(laberinto, ui, semillaInicial, ph, pp, p->llaves, p->salida);
 
-        // Humano remoto (servidor)
-        heroe = std::make_shared<HeroeRemoto>(posicionInicialHeroe, ui, laberinto, red);
-
-        // Humano local (cliente)
-        perseguidor = std::make_shared<PerseguidorHumanoLocal>(posicionInicialPerseguidor, ui, laberinto, red);
-
-    }
-    else if (opcion == Tecla::CUATRO) {
-
-        return 0;
+        p->heroe = std::make_shared<HeroeRemoto>(ph, ui, laberinto, red);
+        p->perseguidor = std::make_shared<PerseguidorHumanoLocal>(pp, ui, laberinto, red);
     }
 
-    int contadorFrames = 0;
-
-	// Game loop
-    while (estadoJuego == Estado::JUGANDO) {
-        // Marcar el inicio del frame
+    // -----------------------------------------------------------------
+    // 4. Game loop
+    // -----------------------------------------------------------------
+#ifdef CURSES
+    // ncurses: while bloqueante con sleep manual
+    while (p->estadoJuego == Estado::JUGANDO) {
         auto inicioFrame = std::chrono::steady_clock::now();
 
-        heroe->mover();
+        ejecutarFrame(*p);
 
-        if (contadorFrames % FRAMES_ESPERA_STALKER == 0) {
-            perseguidor->mover();
-        }
-
-        // Lógica de Colisiones
-        if (heroe->posicion == perseguidor->posicion) {
-            estadoJuego = Estado::PERDIDO;
-        }
-
-        // Lógica de Llaves y Salida
-        if (estadoJuego != Estado::PERDIDO) {
-            for (int i = 0; i < NUM_LLAVES; i++) {
-                if (heroe->posicion == llaves[i].posicion && llaves[i].recolectada != true) {
-                    llaves[i].recolectada = true;
-                    llavesRecolectadas++;
-                }
-            }
-
-            bool todasLlaves = true;
-            for (int i = 0; i < NUM_LLAVES; i++) {
-                if (llaves[i].recolectada == false) {
-                    todasLlaves = false;
-                    break;
-                }
-            }
-
-            if (todasLlaves) {
-                if (heroe->posicion == salida) {
-                    estadoJuego = Estado::GANADO;
-                }
-            }
-            else {
-                ui->desplegarTexto("Llaves restantes: " + std::to_string(NUM_LLAVES - llavesRecolectadas));
-            }
-        }
-
-        // Dibujar en pantalla
-        ui->render();
-
-        // Aumentar el reloj interno
-        contadorFrames++;
-
-        // CÁLCULO DE FPS EXACTOS
-        auto finFrame = std::chrono::steady_clock::now();
-        auto tiempoTranscurrido = std::chrono::duration_cast<std::chrono::milliseconds>(finFrame - inicioFrame);
-
-        // Si nos sobró tiempo, dormimos el hilo
-        if (tiempoTranscurrido < duracionFrame) {
-            std::this_thread::sleep_for(duracionFrame - tiempoTranscurrido);
-        }
+        auto fin = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicioFrame);
+        if (elapsed < duracionFrame)
+            std::this_thread::sleep_for(duracionFrame - elapsed);
     }
-    // Termina el juego
+    terminarJuego(*p);
 
-    if (estadoJuego == Estado::PERDIDO) {
-        heroe->perder();
-        perseguidor->ganar();
-
-    }
-    else if (estadoJuego == Estado::GANADO) {
-        heroe->ganar();
-        perseguidor->perder();
-    }
-
-    // Detener el juego
+    // Esperar tecla final
+    Tecla t;
     do {
-        opcion = ui->leerTeclado();
+        t = ui->leerTeclado();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    } while (t == Tecla::NADA);
 
-    } while (opcion == Tecla::NADA);
+#elif defined(QT)
+    // Qt: QTimer dispara cada frame — no bloquea el event loop
+    QTimer timer;
+    QObject::connect(&timer, &QTimer::timeout, [&]() {
+        auto inicioFrame = std::chrono::steady_clock::now();
 
-	return 0;
+        bool jugando = ejecutarFrame(*p);
+
+        if (!jugando) {
+            timer.stop();
+            terminarJuego(*p);
+            // Esperar tecla final antes de cerrar
+            QTimer::singleShot(0, [&]() {
+                Tecla t = Tecla::NADA;
+                while (t == Tecla::NADA) {
+                    t = ui->leerTeclado();
+                    QApplication::processEvents();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
+                QApplication::quit();
+                });
+        }
+
+        auto fin = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicioFrame);
+        if (elapsed < duracionFrame)
+            std::this_thread::sleep_for(duracionFrame - elapsed);
+        });
+
+    timer.start(std::chrono::duration_cast<std::chrono::milliseconds>(duracionFrame).count());
+    return app.exec();
+#endif
+
+    return 0;
 }

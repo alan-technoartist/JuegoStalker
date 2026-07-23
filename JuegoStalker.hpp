@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define CURSES
+#define QT
 
 #include <thread>
 #include "Common/Common.hpp"
@@ -19,10 +19,7 @@
 
 #ifdef CURSES
 #include "UI/UINcurses.hpp"
-#elif QT
-//#include "UI/UIQT.hpp"
+#elif defined(QT)
+#include "UI/UIQT.hpp"
 #endif
 
-const int TARGET_FPS = 30;
-const std::chrono::milliseconds duracionFrame(1000 / TARGET_FPS); // ~33ms por frame
-const int FRAMES_ESPERA_STALKER = 15;

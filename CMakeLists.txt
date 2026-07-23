@@ -13,7 +13,6 @@ project ("JuegoStalker")
 
 find_package(unofficial-pdcurses REQUIRED)
 find_package(Boost REQUIRED)
-find_package(Doxygen)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -40,12 +39,19 @@ if(DOXYGEN_FOUND)
 	)
 endif()
 
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+# Habilitar herramientas de meta-compilación de Qt
+set(CMAKE_AUTOMOC ON) 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
 # Add source to this project's executable.
 add_executable (JuegoStalker
 	"JuegoStalker.cpp"
 	"JuegoStalker.hpp"
 	"Laberinto/Laberinto.cpp"
 	"UI/UINcurses.cpp"
+	"UI/UIQT.cpp"
 	"Personaje/Heroe/HeroeLocalSolo.cpp"
 	"Red/ServidorRed.cpp"
 	"Red/ClienteRed.cpp"
@@ -66,6 +72,25 @@ add_custom_command(TARGET JuegoStalker POST_BUILD
 
 target_link_libraries(JuegoStalker PRIVATE unofficial::pdcurses::pdcurses)
 target_link_libraries(JuegoStalker PRIVATE Boost::headers)
+target_link_libraries(JuegoStalker PRIVATE Qt6::Core Qt6::Widgets)
+
+# 1. Le pedimos a CMake que averigüe dónde está la carpeta "bin" de tu Qt
+get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
+get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+    
+# 2. Buscamos el programa windeployqt en esa carpeta
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt6 PATHS "${_qt_bin_dir}")
+
+# 3. Creamos el evento "Post-Build" automático
+if(WINDEPLOYQT_EXECUTABLE)
+    add_custom_command(TARGET JuegoStalker POST_BUILD
+        COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE:JuegoStalker>
+        COMMENT "Ejecutando windeployqt para copiar las DLLs de Qt..."
+    )
+else()
+    message(WARNING "No se encontró windeployqt. Las DLLs no se copiarán.")
+endif()
+
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET JuegoStalker PROPERTY CXX_STANDARD 20)
